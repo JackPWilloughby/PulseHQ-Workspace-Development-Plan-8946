@@ -27,7 +27,7 @@ const Sidebar = ({ currentView, onViewChange, user, onSignOut, onUpdateProfile }
       <div className="flex-shrink-0 p-4 border-b border-dark-border">
         <div className="flex items-center justify-between">
           {!sidebarCollapsed && (
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -83,7 +83,9 @@ const Sidebar = ({ currentView, onViewChange, user, onSignOut, onUpdateProfile }
             <motion.button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              className={`w-full flex items-center justify-center ${sidebarCollapsed ? 'px-2 py-4' : 'px-4 py-3'} rounded-lg transition-all duration-200 text-sm font-medium relative group`}
+              className={`w-full flex items-center justify-center ${
+                sidebarCollapsed ? 'px-2 py-4' : 'px-4 py-3'
+              } rounded-lg transition-all duration-200 text-sm font-medium relative group`}
               title={sidebarCollapsed ? item.label : undefined}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -96,7 +98,7 @@ const Sidebar = ({ currentView, onViewChange, user, onSignOut, onUpdateProfile }
                   transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                 />
               )}
-              
+
               {/* Icon */}
               <SafeIcon 
                 icon={item.icon} 
@@ -106,7 +108,7 @@ const Sidebar = ({ currentView, onViewChange, user, onSignOut, onUpdateProfile }
                     : 'text-dark-text-secondary group-hover:text-accent-blue'
                 }`} 
               />
-              
+
               {/* Label */}
               <AnimatePresence>
                 {!sidebarCollapsed && (
@@ -141,12 +143,15 @@ const Sidebar = ({ currentView, onViewChange, user, onSignOut, onUpdateProfile }
       <div className="flex-shrink-0 p-4 border-t border-dark-border relative">
         <button
           onClick={() => setShowProfileMenu(!showProfileMenu)}
-          className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2 py-4' : 'px-3 py-3'} text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors`}
+          className={`w-full flex items-center ${
+            sidebarCollapsed ? 'justify-center px-2 py-4' : 'px-3 py-3'
+          } text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors`}
           title={sidebarCollapsed ? user?.name || 'Profile' : undefined}
         >
           <div className={`${sidebarCollapsed ? 'w-8 h-8' : 'w-6 h-6'} bg-accent-blue rounded-full flex items-center justify-center text-white text-sm font-medium`}>
             {user?.name?.[0] || 'U'}
           </div>
+          
           <AnimatePresence>
             {!sidebarCollapsed && (
               <motion.div

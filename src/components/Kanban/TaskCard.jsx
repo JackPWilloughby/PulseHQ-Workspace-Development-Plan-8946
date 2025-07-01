@@ -16,7 +16,13 @@ const TaskCard = ({ task, isDragging, isSelected, onSelect, onEdit }) => {
     transform,
     transition,
     isDragging: isSortableDragging
-  } = useSortable({ id: task.id })
+  } = useSortable({ 
+    id: task.id,
+    data: {
+      type: 'task',
+      task
+    }
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -26,8 +32,8 @@ const TaskCard = ({ task, isDragging, isSelected, onSelect, onEdit }) => {
   const isOverdue = task.due_date && new Date(task.due_date) < new Date()
 
   const handleCardClick = (e) => {
-    // Ensure we don't trigger on drag handle or edit button
-    if (e.target.closest('.drag-handle') || e.target.closest('button')) {
+    // Prevent click when dragging or clicking drag handle/edit button
+    if (e.target.closest('.drag-handle') || e.target.closest('.edit-button')) {
       return
     }
     e.stopPropagation()
@@ -39,6 +45,7 @@ const TaskCard = ({ task, isDragging, isSelected, onSelect, onEdit }) => {
 
   const handleEditClick = (e) => {
     e.stopPropagation()
+    e.preventDefault()
     console.log('Task edit clicked:', task.id)
     if (onEdit) {
       onEdit(task)
@@ -51,7 +58,7 @@ const TaskCard = ({ task, isDragging, isSelected, onSelect, onEdit }) => {
       style={style}
       whileHover={{ scale: 1.02 }}
       className={`
-        group bg-dark-bg border rounded-lg transition-all duration-200 hover:shadow-lg hover:border-accent-blue/50 min-h-[180px] flex flex-col
+        group bg-dark-bg border rounded-lg transition-all duration-200 hover:shadow-lg hover:border-accent-blue/50 min-h-[180px] flex flex-col cursor-pointer
         ${isSelected ? 'ring-2 ring-accent-blue border-accent-blue' : 'border-dark-border'}
         ${isDragging || isSortableDragging ? 'opacity-95 shadow-xl z-50' : ''}
         ${isOverdue ? 'border-l-4 border-l-accent-red' : ''}
@@ -59,21 +66,24 @@ const TaskCard = ({ task, isDragging, isSelected, onSelect, onEdit }) => {
     >
       {/* Drag Handle */}
       <div 
-        {...attributes}
+        {...attributes} 
         {...listeners}
         className="drag-handle flex items-center justify-between p-3 pb-2 cursor-grab active:cursor-grabbing"
       >
         <SafeIcon icon={FiGripVertical} className="w-4 h-4 text-dark-text-muted opacity-50" />
         <button
           onClick={handleEditClick}
-          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-dark-surface rounded transition-all"
+          className="edit-button opacity-0 group-hover:opacity-100 p-1 hover:bg-dark-surface rounded transition-all"
         >
           <SafeIcon icon={FiEdit2} className="w-3 h-3 text-dark-text-muted" />
         </button>
       </div>
 
       {/* Card Content - Clickable Area */}
-      <div className="px-3 pb-3 flex-1 flex flex-col cursor-pointer" onClick={handleCardClick}>
+      <div 
+        className="px-3 pb-3 flex-1 flex flex-col" 
+        onClick={handleCardClick}
+      >
         {/* Task Title & Description */}
         <div className="flex-1 mb-3">
           <h3 className="font-medium text-dark-text-primary text-sm mb-2 line-clamp-2 leading-tight">
@@ -97,7 +107,9 @@ const TaskCard = ({ task, isDragging, isSelected, onSelect, onEdit }) => {
                 </div>
               )}
               {task.due_date && (
-                <div className={`flex items-center space-x-1 ${isOverdue ? 'text-accent-red' : 'text-dark-text-muted'}`}>
+                <div className={`flex items-center space-x-1 ${
+                  isOverdue ? 'text-accent-red' : 'text-dark-text-muted'
+                }`}>
                   <SafeIcon icon={FiClock} className="w-3 h-3" />
                   <span>{format(new Date(task.due_date), 'MMM d')}</span>
                 </div>
@@ -117,12 +129,13 @@ const TaskCard = ({ task, isDragging, isSelected, onSelect, onEdit }) => {
               </div>
             </div>
             <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-              task.status === 'todo' ? 'bg-dark-text-muted/20 text-dark-text-muted' :
-              task.status === 'doing' ? 'bg-accent-blue/20 text-accent-blue' :
-              'bg-accent-green/20 text-accent-green'
+              task.status === 'todo' 
+                ? 'bg-dark-text-muted/20 text-dark-text-muted' 
+                : task.status === 'doing' 
+                ? 'bg-accent-blue/20 text-accent-blue' 
+                : 'bg-accent-green/20 text-accent-green'
             }`}>
-              {task.status === 'todo' ? 'To-Do' : 
-               task.status === 'doing' ? 'In Progress' : 'Done'}
+              {task.status === 'todo' ? 'To-Do' : task.status === 'doing' ? 'In Progress' : 'Done'}
             </div>
           </div>
         </div>

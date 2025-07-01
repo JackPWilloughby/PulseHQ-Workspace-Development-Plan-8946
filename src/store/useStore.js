@@ -1,140 +1,144 @@
 import { create } from 'zustand'
-import { supabase } from '../config/supabase'
+import { persist } from 'zustand/middleware'
 
-const useStore = create((set, get) => ({
-  // UI State
-  sidebarCollapsed: false,
-  inspectorOpen: false,
-  selectedContact: null,
-  selectedTask: null,
-  searchQuery: '',
-
-  // Data
-  tasks: [],
-  contacts: [],
-  messages: [],
-  comments: [],
-  notes: [],
-  users: [
+const useStore = create(
+  persist(
+    (set, get) => ({
+      // Auth
+      user: null,
+      loading: false,
+      
+      // UI
+      currentView: 'tasks',
+      sidebarOpen: true,
+      
+      // Data
+      tasks: [],
+      contacts: [],
+      messages: [],
+      teamMembers: [],
+      
+      // Actions
+      setUser: (user) => set({ user }),
+      setLoading: (loading) => set({ loading }),
+      setCurrentView: (view) => set({ currentView: view }),
+      setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      setTeamMembers: (teamMembers) => set({ teamMembers }),
+      
+      // Tasks
+      addTask: (task) => set((state) => ({ 
+        tasks: [...state.tasks, { ...task, id: Date.now().toString() }] 
+      })),
+      updateTask: (id, updates) => set((state) => ({
+        tasks: state.tasks.map(task => 
+          task.id === id ? { ...task, ...updates } : task
+        )
+      })),
+      deleteTask: (id) => set((state) => ({
+        tasks: state.tasks.filter(task => task.id !== id)
+      })),
+      
+      // Contacts
+      addContact: (contact) => set((state) => ({ 
+        contacts: [...state.contacts, { ...contact, id: Date.now().toString() }] 
+      })),
+      updateContact: (id, updates) => set((state) => ({
+        contacts: state.contacts.map(contact => 
+          contact.id === id ? { ...contact, ...updates } : contact
+        )
+      })),
+      deleteContact: (id) => set((state) => ({
+        contacts: state.contacts.filter(contact => contact.id !== id)
+      })),
+      
+      // Messages
+      addMessage: (message) => set((state) => ({ 
+        messages: [...state.messages, { ...message, id: Date.now().toString() }] 
+      })),
+      
+      // Initialize with sample data
+      initializeData: () => set({
+        tasks: [
+          {
+            id: '1',
+            title: 'Design landing page',
+            description: 'Create mockups for new product page',
+            status: 'todo',
+            priority: 'high',
+            assignee: 'John Doe',
+            dueDate: '2024-01-20'
+          },
+          {
+            id: '2',
+            title: 'Client meeting prep',
+            description: 'Prepare slides for quarterly review',
+            status: 'in-progress',
+            priority: 'medium',
+            assignee: 'Jane Smith',
+            dueDate: '2024-01-18'
+          },
+          {
+            id: '3',
+            title: 'Update documentation',
+            description: 'Refresh API documentation',
+            status: 'done',
+            priority: 'low',
+            assignee: 'Bob Johnson',
+            dueDate: '2024-01-15'
+          }
+        ],
+        contacts: [
+          {
+            id: '1',
+            name: 'Acme Corp',
+            email: 'contact@acme.com',
+            phone: '+1 (555) 123-4567',
+            company: 'Acme Corporation',
+            status: 'client',
+            assignee: 'John Doe'
+          },
+          {
+            id: '2',
+            name: 'Jane Wilson',
+            email: 'jane@techstart.com',
+            phone: '+1 (555) 987-6543',
+            company: 'Tech Startup',
+            status: 'lead',
+            assignee: 'Jane Smith'
+          }
+        ],
+        messages: [
+          {
+            id: '1',
+            author: 'John Doe',
+            content: 'Great work on the project everyone! 🎉',
+            timestamp: new Date().toISOString()
+          },
+          {
+            id: '2',
+            author: 'Jane Smith',
+            content: 'Thanks! Ready for the next phase.',
+            timestamp: new Date().toISOString()
+          }
+        ],
+        teamMembers: [
+          { id: '1', name: 'John Doe', email: 'john@company.com', role: 'Designer' },
+          { id: '2', name: 'Jane Smith', email: 'jane@company.com', role: 'Developer' },
+          { id: '3', name: 'Bob Johnson', email: 'bob@company.com', role: 'Manager' }
+        ]
+      })
+    }),
     {
-      id: 'user1',
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'admin',
-      avatar: null
-    },
-    {
-      id: 'user2', 
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      role: 'member',
-      avatar: null
-    },
-    {
-      id: 'current-user',
-      name: 'You',
-      email: 'you@example.com',
-      role: 'owner',
-      avatar: null
+      name: 'pulsehq-storage',
+      partialize: (state) => ({
+        tasks: state.tasks,
+        contacts: state.contacts,
+        messages: state.messages,
+        teamMembers: state.teamMembers,
+        sidebarOpen: state.sidebarOpen
+      })
     }
-  ],
-
-  // Actions
-  setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
-  setInspectorOpen: (open) => set({ inspectorOpen: open }),
-  setSelectedContact: (contact) => set({ 
-    selectedContact: contact, 
-    selectedTask: null, // Clear task when selecting contact
-    inspectorOpen: !!contact 
-  }),
-  setSelectedTask: (task) => set({ 
-    selectedTask: task, 
-    selectedContact: null, // Clear contact when selecting task
-    inspectorOpen: !!task 
-  }),
-  setSearchQuery: (query) => set({ searchQuery: query }),
-
-  // Data Actions
-  setTasks: (tasks) => set({ tasks }),
-  setContacts: (contacts) => set({ contacts }),
-  setMessages: (messages) => set({ messages }),
-  setComments: (comments) => set({ comments }),
-  setNotes: (notes) => set({ notes }),
-  setUsers: (users) => set({ users }),
-
-  // Add functions
-  addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
-  addContact: (contact) => set((state) => ({ contacts: [...state.contacts, contact] })),
-  addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  addComment: (comment) => set((state) => ({ comments: [...state.comments, comment] })),
-  addNote: (note) => set((state) => ({ notes: [...state.notes, note] })),
-  addUser: (user) => set((state) => ({ users: [...state.users, user] })),
-
-  // Update functions
-  updateTask: (id, updates) => set((state) => {
-    const updatedTasks = state.tasks.map(task => 
-      task.id === id ? { ...task, ...updates } : task
-    )
-    
-    // Update selectedTask if it's the one being updated
-    const updatedSelectedTask = state.selectedTask?.id === id 
-      ? { ...state.selectedTask, ...updates } 
-      : state.selectedTask
-
-    return { 
-      tasks: updatedTasks, 
-      selectedTask: updatedSelectedTask 
-    }
-  }),
-
-  updateContact: (id, updates) => set((state) => {
-    const updatedContacts = state.contacts.map(contact => 
-      contact.id === id ? { ...contact, ...updates } : contact
-    )
-    
-    // Update selectedContact if it's the one being updated
-    const updatedSelectedContact = state.selectedContact?.id === id 
-      ? { ...state.selectedContact, ...updates } 
-      : state.selectedContact
-
-    return { 
-      contacts: updatedContacts, 
-      selectedContact: updatedSelectedContact 
-    }
-  }),
-
-  updateNote: (id, updates) => set((state) => ({
-    notes: state.notes.map(note => 
-      note.id === id ? { ...note, ...updates } : note
-    )
-  })),
-
-  updateUser: (id, updates) => set((state) => ({
-    users: state.users.map(user => 
-      user.id === id ? { ...user, ...updates } : user
-    )
-  })),
-
-  // Delete functions
-  deleteTask: (id) => set((state) => ({
-    tasks: state.tasks.filter(task => task.id !== id),
-    selectedTask: state.selectedTask?.id === id ? null : state.selectedTask,
-    inspectorOpen: state.selectedTask?.id === id ? false : state.inspectorOpen
-  })),
-
-  deleteContact: (id) => set((state) => ({
-    contacts: state.contacts.filter(contact => contact.id !== id),
-    selectedContact: state.selectedContact?.id === id ? null : state.selectedContact,
-    inspectorOpen: state.selectedContact?.id === id ? false : state.inspectorOpen
-  })),
-
-  deleteNote: (id) => set((state) => ({
-    notes: state.notes.filter(note => note.id !== id)
-  })),
-
-  deleteUser: (id) => set((state) => ({
-    users: state.users.filter(user => user.id !== id)
-  })),
-}))
+  )
+)
 
 export default useStore

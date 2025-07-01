@@ -2,21 +2,26 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import * as FiIcons from 'react-icons/fi'
 import SafeIcon from '../common/SafeIcon'
+import UserManagementModal from '../UserManagement/UserManagementModal'
 
-const { FiUser, FiLogOut, FiCamera, FiSave, FiX, FiUserPlus, FiSettings, FiShield } = FiIcons
+const { FiUser, FiLogOut, FiCamera, FiSave, FiX, FiUsers } = FiIcons
 
 const ProfileMenu = ({ user, onClose, onSignOut, onUpdateProfile, collapsed }) => {
   const [showEditProfile, setShowEditProfile] = useState(false)
-  const [showAddUser, setShowAddUser] = useState(false)
+  const [showUserManagement, setShowUserManagement] = useState(false)
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
-    email: user?.email || '',
-    avatar: user?.avatar || ''
+    email: user?.email || ''
   })
 
   const handleSaveProfile = () => {
     onUpdateProfile(profileData)
     setShowEditProfile(false)
+    onClose()
+  }
+
+  const handleUserManagement = () => {
+    setShowUserManagement(true)
     onClose()
   }
 
@@ -73,6 +78,7 @@ const ProfileMenu = ({ user, onClose, onSignOut, onUpdateProfile, collapsed }) =
               value={profileData.email}
               onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
               className="w-full px-3 py-2 text-sm bg-dark-bg border border-dark-border rounded-lg text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent"
+              disabled
             />
           </div>
 
@@ -97,54 +103,47 @@ const ProfileMenu = ({ user, onClose, onSignOut, onUpdateProfile, collapsed }) =
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      className={`absolute ${collapsed ? 'left-16 bottom-0' : 'left-0 bottom-16'} bg-dark-surface border border-dark-border rounded-lg shadow-xl z-50 w-48`}
-    >
-      <div className="p-2">
-        <button
-          onClick={() => setShowEditProfile(true)}
-          className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors"
-        >
-          <SafeIcon icon={FiUser} className="w-4 h-4 mr-3" />
-          Edit Profile
-        </button>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        className={`absolute ${collapsed ? 'left-16 bottom-0' : 'left-0 bottom-16'} bg-dark-surface border border-dark-border rounded-lg shadow-xl z-50 w-48`}
+      >
+        <div className="p-2">
+          <button
+            onClick={() => setShowEditProfile(true)}
+            className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors"
+          >
+            <SafeIcon icon={FiUser} className="w-4 h-4 mr-3" />
+            Edit Profile
+          </button>
+          
+          <button
+            onClick={handleUserManagement}
+            className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors"
+          >
+            <SafeIcon icon={FiUsers} className="w-4 h-4 mr-3" />
+            Users
+          </button>
+          
+          <hr className="my-2 border-dark-border" />
+          
+          <button
+            onClick={onSignOut}
+            className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-accent-red rounded-lg transition-colors"
+          >
+            <SafeIcon icon={FiLogOut} className="w-4 h-4 mr-3" />
+            Sign Out
+          </button>
+        </div>
+      </motion.div>
 
-        <button
-          onClick={() => setShowAddUser(true)}
-          className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors"
-        >
-          <SafeIcon icon={FiUserPlus} className="w-4 h-4 mr-3" />
-          Add User
-        </button>
-
-        <button
-          className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors"
-        >
-          <SafeIcon icon={FiSettings} className="w-4 h-4 mr-3" />
-          Workspace Settings
-        </button>
-
-        <button
-          className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-dark-text-primary rounded-lg transition-colors"
-        >
-          <SafeIcon icon={FiShield} className="w-4 h-4 mr-3" />
-          Security
-        </button>
-
-        <hr className="my-2 border-dark-border" />
-
-        <button
-          onClick={onSignOut}
-          className="w-full flex items-center px-3 py-2 text-sm text-dark-text-secondary hover:bg-dark-bg hover:text-accent-red rounded-lg transition-colors"
-        >
-          <SafeIcon icon={FiLogOut} className="w-4 h-4 mr-3" />
-          Sign Out
-        </button>
-      </div>
-    </motion.div>
+      {/* User Management Modal */}
+      {showUserManagement && (
+        <UserManagementModal onClose={() => setShowUserManagement(false)} />
+      )}
+    </>
   )
 }
 

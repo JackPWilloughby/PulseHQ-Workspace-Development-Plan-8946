@@ -26,11 +26,13 @@ const TaskModal = ({ onClose, onSave, task }) => {
       assignee_name: assignedUser?.name || null
     }
     
+    console.log('💾 Saving task:', taskData)
     onSave(taskData)
   }
 
   const handleDelete = () => {
     if (task && window.confirm('Are you sure you want to delete this task?')) {
+      console.log('🗑️ Deleting task:', task.id)
       deleteTask(task.id)
       onClose()
     }
