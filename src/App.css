@@ -70,14 +70,8 @@ select:focus {
 }
 
 @keyframes slideUp {
-  from { 
-    transform: translateY(8px); 
-    opacity: 0; 
-  }
-  to { 
-    transform: translateY(0); 
-    opacity: 1; 
-  }
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 /* Mobile responsive utilities */
@@ -109,4 +103,63 @@ code {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+}
+
+/* Enhanced sidebar animations */
+.sidebar-nav-button {
+  position: relative;
+  overflow: visible;
+}
+
+/* Smooth layout animations */
+.layout-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Icon glow effect */
+.icon-glow {
+  filter: drop-shadow(0 0 8px currentColor);
+  transition: filter 0.2s ease;
+}
+
+/* Tooltip animations */
+.tooltip-enter {
+  animation: tooltipSlideIn 0.2s ease-out;
+}
+
+@keyframes tooltipSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Active tab indicator */
+.active-tab-indicator {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Smooth hover transitions */
+.nav-item-hover {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.nav-item-hover:hover {
+  transform: translateY(-1px);
+}
+
+/* Profile section enhancements */
+.profile-avatar {
+  transition: all 0.2s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }

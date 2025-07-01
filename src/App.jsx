@@ -20,7 +20,7 @@ import useStore from './store/useStore'
 import './App.css'
 
 const App = () => {
-  const { user, loading, signInWithMagicLink, signOut, updateUser } = useAuth()
+  const { user, loading, signInWithEmailAndPassword, signOut, updateUser } = useAuth()
   const { 
     sidebarCollapsed, 
     setSidebarCollapsed, 
@@ -63,6 +63,7 @@ const App = () => {
           due_date: '2024-01-15',
           assignee_id: 'user1',
           assignee_name: 'John Doe',
+          priority: 'high',
           created_at: '2024-01-10T10:00:00Z'
         },
         {
@@ -72,6 +73,7 @@ const App = () => {
           status: 'doing',
           assignee_id: 'user2',
           assignee_name: 'Jane Smith',
+          priority: 'medium',
           created_at: '2024-01-10T11:00:00Z'
         },
         {
@@ -81,6 +83,7 @@ const App = () => {
           status: 'done',
           assignee_id: 'user1',
           assignee_name: 'John Doe',
+          priority: 'low',
           created_at: '2024-01-09T09:00:00Z'
         }
       ])
@@ -171,6 +174,7 @@ const App = () => {
 
     window.addEventListener('resize', handleResize)
     handleResize()
+
     return () => window.removeEventListener('resize', handleResize)
   }, [setSidebarCollapsed])
 
@@ -186,7 +190,7 @@ const App = () => {
   }
 
   if (!user) {
-    return <AuthForm onSignIn={signInWithMagicLink} />
+    return <AuthForm onSignIn={signInWithEmailAndPassword} />
   }
 
   const renderMainContent = () => {
